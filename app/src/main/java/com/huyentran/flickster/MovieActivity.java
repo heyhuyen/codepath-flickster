@@ -1,5 +1,6 @@
 package com.huyentran.flickster;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +21,13 @@ import cz.msebera.android.httpclient.Header;
 
 public class MovieActivity extends AppCompatActivity {
 
+    private static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
+
     ArrayList<Movie> movies;
     MovieArrayAdapter movieAdapter;
     ListView lvMovies;
+    private SwipeRefreshLayout swipeContainer;
+    private AsyncHttpClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,27 +38,48 @@ public class MovieActivity extends AppCompatActivity {
         movies = new ArrayList<>();
         movieAdapter = new MovieArrayAdapter(this, movies);
         lvMovies.setAdapter(movieAdapter);
+        client = new AsyncHttpClient();
+        fetchNowPlayingAsync();
 
-        String url = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
+        // Lookup the swipe container view
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchNowPlayingAsync();
+                // Now we call setRefreshing(false) to signal refresh has finished
+                swipeContainer.setRefreshing(false);
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+    public void fetchNowPlayingAsync() {
+        client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray movieJsonResults = null;
                 try {
+                    movieAdapter.clear();
                     movieJsonResults = response.getJSONArray("results");
-                    movies.addAll(Movie.fromJSONArray(movieJsonResults));
-                    movieAdapter.notifyDataSetChanged();
-                    Log.d("DEBUG", movieJsonResults.toString());
+                    movieAdapter.addAll(Movie.fromJSONArray(movieJsonResults));
                 } catch (JSONException e) {
+                    Log.d("DEBUG", "Fetch now playing error: " + e.toString());
                     e.printStackTrace();
                 }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            public void onFailure(int statusCode, Header[] headers, String responseString,
+                                  Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
     }
+
 }
