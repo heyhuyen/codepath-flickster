@@ -37,6 +37,20 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         super(context, android.R.layout.simple_list_item_1, movies);
     }
 
+    // Returns the number of types of Views that will be created by getView(int, View, ViewGroup)
+    @Override
+    public int getViewTypeCount() {
+        return Movie.Type.values().length;
+    }
+
+    // Get the type of View that will be created by getView(int, View, ViewGroup)
+    // for the specified item.
+    @Override
+    public int getItemViewType(int position) {
+        return getItem(position).getType().ordinal();
+    }
+
+    // Get a View that displays the data at the specified position in the data set.
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -46,10 +60,14 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         // check if the existing view is being reused; otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {
+            // Get the data item type for this position
+            int type = getItemViewType(position);
+
             // If there's no view to re-use, inflate a brand new view for row
             viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.item_movie, parent, false);
+
+            // Inflate XML layout based on the type
+            convertView = getInflatedLayoutForType(type, parent);
             viewHolder.poster = (ImageView) convertView.findViewById(ivPoster);
             viewHolder.title = (TextView) convertView.findViewById(tvTitle);
             viewHolder.overview = (TextView) convertView.findViewById(tvOverview);
@@ -62,22 +80,37 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         }
 
         // populate data
+        if (viewHolder.title != null) {
+            viewHolder.title.setText(movie.getOriginalTitle());
+        }
+        if (viewHolder.overview != null) {
+            viewHolder.overview.setText(movie.getOverview());
+        }
+        String imagePath;
+        ImageView imageView;
         if (viewHolder.poster != null) {
             viewHolder.poster.setImageResource(0);
-        } else if (viewHolder.backdrop != null) {
+            imagePath = movie.getPosterPath();
+            imageView = viewHolder.poster;
+        } else {
             viewHolder.backdrop.setImageResource(0);
+            imagePath = movie.getBackdropPath();
+            imageView = viewHolder.backdrop;
         }
-        viewHolder.title.setText(movie.getOriginalTitle());
-        viewHolder.overview.setText(movie.getOverview());
-        // check orientation to populate appropriate image
-        int orientation = getContext().getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Picasso.with(getContext()).load(movie.getPosterPath()).into(viewHolder.poster);
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Picasso.with(getContext()).load(movie.getBackdropPath()).into(viewHolder.backdrop);
-        }
+        Picasso.with(getContext()).load(imagePath).into(imageView);
 
         // return the view
         return convertView;
+    }
+
+    // Given the item type, responsible for returning the correct inflated XML layout file
+    private View getInflatedLayoutForType(int type, ViewGroup parent) {
+        if (type == Movie.Type.POPULAR.ordinal()) {
+            return LayoutInflater.from(getContext()).inflate(R.layout.item_popular, parent, false);
+        } else if (type == Movie.Type.AVERAGE.ordinal()) {
+            return LayoutInflater.from(getContext()).inflate(R.layout.item_movie, parent, false);
+        } else {
+            return null;
+        }
     }
 }
