@@ -1,7 +1,6 @@
 package com.huyentran.flickster.adapters;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,8 @@ import com.huyentran.flickster.models.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 import static com.huyentran.flickster.R.id.ivPoster;
 import static com.huyentran.flickster.R.id.tvOverview;
@@ -32,6 +33,11 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         TextView overview;
         ImageView backdrop;
     }
+
+    private static final int POSTER_WIDTH = 342;
+    private static final int BACKDROP_WIDTH = 780;
+    private static final int ROUNDED_CORNER_RADIUS = 10;
+    private static final int ROUNDED_CORNER_MARGIN = 10;
 
     public MovieArrayAdapter(Context context, List<Movie> movies) {
         super(context, android.R.layout.simple_list_item_1, movies);
@@ -86,18 +92,24 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         if (viewHolder.overview != null) {
             viewHolder.overview.setText(movie.getOverview());
         }
-        String imagePath;
-        ImageView imageView;
+        String imagePath = movie.getPosterPath();
+        ImageView imageView = viewHolder.poster;
+        int targetWidth = POSTER_WIDTH;
         if (viewHolder.poster != null) {
             viewHolder.poster.setImageResource(0);
-            imagePath = movie.getPosterPath();
-            imageView = viewHolder.poster;
         } else {
             viewHolder.backdrop.setImageResource(0);
             imagePath = movie.getBackdropPath();
             imageView = viewHolder.backdrop;
+            targetWidth = BACKDROP_WIDTH;
         }
-        Picasso.with(getContext()).load(imagePath).into(imageView);
+        Picasso.with(getContext()).load(imagePath)
+                .placeholder(R.drawable.film_icon)
+                .error(R.drawable.image_broken)
+                .resize(targetWidth, 0)
+                .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
+                        ROUNDED_CORNER_MARGIN))
+                .into(imageView);
 
         // return the view
         return convertView;
