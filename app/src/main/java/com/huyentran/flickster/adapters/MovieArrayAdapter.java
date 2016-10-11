@@ -1,6 +1,7 @@
 package com.huyentran.flickster.adapters;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         ImageView poster;
         TextView title;
         TextView overview;
+        ImageView backdrop;
     }
 
     public MovieArrayAdapter(Context context, List<Movie> movies) {
@@ -51,6 +53,7 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
             viewHolder.poster = (ImageView) convertView.findViewById(ivPoster);
             viewHolder.title = (TextView) convertView.findViewById(tvTitle);
             viewHolder.overview = (TextView) convertView.findViewById(tvOverview);
+            viewHolder.backdrop = (ImageView) convertView.findViewById(R.id.ivBackdrop);
             // Cache the viewHolder object inside the fresh view
             convertView.setTag(viewHolder);
         } else {
@@ -59,10 +62,20 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         }
 
         // populate data
-        viewHolder.poster.setImageResource(0);
+        if (viewHolder.poster != null) {
+            viewHolder.poster.setImageResource(0);
+        } else if (viewHolder.backdrop != null) {
+            viewHolder.backdrop.setImageResource(0);
+        }
         viewHolder.title.setText(movie.getOriginalTitle());
         viewHolder.overview.setText(movie.getOverview());
-        Picasso.with(getContext()).load(movie.getPosterPath()).into(viewHolder.poster);
+        // check orientation to populate appropriate image
+        int orientation = getContext().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Picasso.with(getContext()).load(movie.getPosterPath()).into(viewHolder.poster);
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Picasso.with(getContext()).load(movie.getBackdropPath()).into(viewHolder.backdrop);
+        }
 
         // return the view
         return convertView;
