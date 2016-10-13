@@ -1,11 +1,15 @@
-package com.huyentran.flickster;
+package com.huyentran.flickster.activities;
 
+import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.huyentran.flickster.R;
 import com.huyentran.flickster.adapters.MovieArrayAdapter;
 import com.huyentran.flickster.models.Movie;
 import com.loopj.android.http.AsyncHttpClient;
@@ -19,6 +23,9 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+/**
+ * The main app activity for movies browsing.
+ */
 public class MovieActivity extends AppCompatActivity {
 
     private static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
@@ -57,6 +64,8 @@ public class MovieActivity extends AppCompatActivity {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        setupListViewListeners();
     }
 
     public void fetchNowPlayingAsync() {
@@ -80,6 +89,26 @@ public class MovieActivity extends AppCompatActivity {
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
+    }
+
+    public void launchMovieDetailView(Movie movie) {
+        Intent i = new Intent(this, MovieDetailActivity.class);
+        i.putExtra("movie", movie);
+        startActivity(i);
+    }
+
+    /**
+     * Adds listeners to the list view: item click and long item clicks for editing and removing.
+     */
+    private void setupListViewListeners() {
+        lvMovies.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
+                        launchMovieDetailView(movies.get(pos));
+                    }
+                }
+        );
     }
 
 }

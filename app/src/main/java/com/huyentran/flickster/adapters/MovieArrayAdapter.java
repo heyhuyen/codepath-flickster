@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.huyentran.flickster.R;
 import com.huyentran.flickster.models.Movie;
+import com.huyentran.flickster.utils.Constants;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -33,11 +34,6 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         TextView overview;
         ImageView backdrop;
     }
-
-    private static final int POSTER_WIDTH = 230;
-    private static final int BACKDROP_WIDTH = 600;
-    private static final int ROUNDED_CORNER_RADIUS = 10;
-    private static final int ROUNDED_CORNER_MARGIN = 10;
 
     public MovieArrayAdapter(Context context, List<Movie> movies) {
         super(context, android.R.layout.simple_list_item_1, movies);
@@ -94,7 +90,7 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         }
         String imagePath = movie.getPosterPath();
         ImageView imageView = viewHolder.poster;
-        int targetWidth = POSTER_WIDTH;
+        int targetWidth = Constants.POSTER_WIDTH;
         int placeholder = R.drawable.poster_placeholder;
         if (viewHolder.poster != null) {
             viewHolder.poster.setImageResource(0);
@@ -102,15 +98,15 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
             viewHolder.backdrop.setImageResource(0);
             imagePath = movie.getBackdropPath();
             imageView = viewHolder.backdrop;
-            targetWidth = BACKDROP_WIDTH;
+            targetWidth = Constants.BACKDROP_WIDTH;
             placeholder = R.drawable.backdrop_placeholder;
         }
         Picasso.with(getContext()).load(imagePath)
                 .placeholder(placeholder)
                 .error(R.drawable.error)
                 .resize(targetWidth, 0)
-                .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
-                        ROUNDED_CORNER_MARGIN))
+                .transform(new RoundedCornersTransformation(Constants.ROUNDED_CORNER_RADIUS,
+                        Constants.ROUNDED_CORNER_MARGIN))
                 .into(imageView);
 
         // return the view
