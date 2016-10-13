@@ -34,8 +34,8 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         ImageView backdrop;
     }
 
-    private static final int POSTER_WIDTH = 342;
-    private static final int BACKDROP_WIDTH = 780;
+    private static final int POSTER_WIDTH = 230;
+    private static final int BACKDROP_WIDTH = 600;
     private static final int ROUNDED_CORNER_RADIUS = 10;
     private static final int ROUNDED_CORNER_MARGIN = 10;
 
@@ -95,6 +95,7 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         String imagePath = movie.getPosterPath();
         ImageView imageView = viewHolder.poster;
         int targetWidth = POSTER_WIDTH;
+        int placeholder = R.drawable.poster_placeholder;
         if (viewHolder.poster != null) {
             viewHolder.poster.setImageResource(0);
         } else {
@@ -102,10 +103,11 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
             imagePath = movie.getBackdropPath();
             imageView = viewHolder.backdrop;
             targetWidth = BACKDROP_WIDTH;
+            placeholder = R.drawable.backdrop_placeholder;
         }
         Picasso.with(getContext()).load(imagePath)
-                .placeholder(R.drawable.film_icon)
-                .error(R.drawable.image_broken)
+                .placeholder(placeholder)
+                .error(R.drawable.error)
                 .resize(targetWidth, 0)
                 .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
                         ROUNDED_CORNER_MARGIN))

@@ -2,7 +2,7 @@
 
 Flickster shows the latest movies currently playing in theaters. The app utilizes the Movie Database API to display images and basic information about these movies to the user.
 
-Time spent: 4 hours spent in total
+Time spent: 5 hours spent in total
 
 ## User Stories
 
@@ -55,6 +55,10 @@ Describe any challenges encountered while building the app.
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
 - [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+
+## Artwork used
+* Film strip: http://cliparts.co/clipart/678562"
+* Sad drama mask: https://www.iconfinder.com/icons/174778/mask_tragedy_icon#size=512
 
 ## License
 
