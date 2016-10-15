@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/ivPoster"
+        android:layout_alignParentEnd="true"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
         tools:text="The Magnificent Seven" />
 
@@ -24,6 +25,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/ivPoster"
+        android:layout_alignBottom="@+id/ivPoster"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+        android:ellipsize="end"
+        android:maxLines="7"
         tools:text="A big screen remake of John Sturges' classic western The Magnificent Seven, itself a remake of Akira Kurosawa's Seven Samurai. Seven gun men in the old west gradually come together to help a poor village against savage thieves." />
 </RelativeLayout>
