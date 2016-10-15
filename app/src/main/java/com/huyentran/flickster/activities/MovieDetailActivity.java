@@ -38,8 +38,12 @@ import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceF
 /**
  * An activity for viewing a single movie in more detail.
  */
-public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubePlayer.OnFullscreenListener {
+public class MovieDetailActivity extends YouTubeBaseActivity {
     Movie movie;
+    AsyncHttpClient client;
+    ArrayList<Video> videos;
+
+    YouTubePlayerView ytTrailer;
     ImageView ivBackdrop;
     ImageView ivPoster;
     TextView tvTitle;
@@ -49,18 +53,39 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
     TextView tvReleaseDate;
     TextView tvRuntime;
 
-    AsyncHttpClient client;
     YouTubePlayer player;
-    YouTubePlayerView ytTrailer;
-    ArrayList<Video> videos;
     boolean trailerLoaded;
     private MyPlayerStateChangeListener playerStateChangeListener;
     private MyPlaybackEventListener playbackEventListener;
+    private MyFullScreenListener fullScreenListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+        findViews();
+        movie = (Movie) getIntent().getSerializableExtra("movie");
+        trailerLoaded = false;
+
+        // populate view data
+        loadImages();
+        tvTitle.setText(movie.getOriginalTitle());
+        tvPopularity.setText(String.valueOf(movie.getPopularity()));
+        tvOverview.setText(movie.getOverview());
+        tvReleaseDate.setText(movie.getReleaseDate());
+        rbRating.setRating(movie.getRating());
+        // tvRuntime
+        // genres?
+        // production companies?
+        // similar movies?
+
+        // fetch videos
+        client = new AsyncHttpClient();
+        setupYoutubeListeners();
+        fetchVideoData(); // TODO: add video data to Movie model
+    }
+
+    private void findViews() {
         ytTrailer = (YouTubePlayerView) findViewById(R.id.ytTrailer);
         ivBackdrop = (ImageView) findViewById(R.id.ivBackdrop);
         ivPoster = (ImageView) findViewById(R.id.ivPoster);
@@ -70,10 +95,9 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
         tvOverview = (TextView) findViewById(R.id.tvOverview);
         tvReleaseDate = (TextView) findViewById(R.id.tvReleaseDate);
         tvRuntime = (TextView) findViewById(R.id.tvRuntime);
+    }
 
-        movie = (Movie) getIntent().getSerializableExtra("movie");
-        tvTitle.setText(movie.getOriginalTitle());
-
+    private void loadImages() {
         Picasso.with(this).load(movie.getBackdropPath())
                 .placeholder(R.drawable.backdrop_placeholder)
                 .error(R.drawable.error)
@@ -90,21 +114,12 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
                 .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
                         ROUNDED_CORNER_MARGIN))
                 .into(ivPoster);
+    }
 
-        tvPopularity.setText(String.valueOf(movie.getPopularity()));
-        tvOverview.setText(movie.getOverview());
-        tvReleaseDate.setText(movie.getReleaseDate());
-
-        rbRating.setRating(movie.getRating());
-        // tvRuntime
-        // genres?
-        // production companies?
-        // similar movies?
-
-        client = new AsyncHttpClient();
-        fetchVideoData();
+    private void setupYoutubeListeners() {
         playerStateChangeListener = new MyPlayerStateChangeListener();
         playbackEventListener = new MyPlaybackEventListener();
+        fullScreenListener = new MyFullScreenListener();
     }
 
     private void fetchVideoData() {
@@ -116,7 +131,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
                     youtubeResults = response.getJSONArray("youtube");
                     videos = Video.fromJSONArray(youtubeResults);
                 } catch (JSONException e) {
-                    Log.d("DEBUG", "Fetch trailer error: " + e.toString());
+                    Log.d("DEBUG", "Parse video data error: " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -125,32 +140,38 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
             public void onFailure(int statusCode, Header[] headers, String responseString,
                                   Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                showMessage("faillll");
+                Log.d("DEBUG", "Fetch trailer error");
             }
         });
     }
 
     private void loadTrailer() {
-        if (videos.isEmpty()) {
-            showMessage("no videos. load trailer failed");
-            return;
+        // check if video data has been fetched
+        if (videos == null) {
+            showMessage("LOAD: no video data, fetching now, try again later");
+            fetchVideoData();
         }
         final String source = youtubeTrailerSourceFromResults(videos);
         if (source == null) {
-            showMessage("no trailer found from videos");
+            showMessage("LOAD: no trailer found from videos"); // TODO: noTrailer flag?
             return;
         }
         ytTrailer.initialize(YOUTUBE_API_KEY,
                 new YouTubePlayer.OnInitializedListener() {
                     @Override
                     public void onInitializationSuccess(YouTubePlayer.Provider provider,
-                                                        YouTubePlayer youTubePlayer, boolean b) {
+                                                        YouTubePlayer youTubePlayer,
+                                                        boolean wasRestored) {
+
                         player = youTubePlayer;
-                        player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
-                        player.setOnFullscreenListener(MovieDetailActivity.this);
+//                        player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+                        player.setOnFullscreenListener(fullScreenListener);
                         player.setPlayerStateChangeListener(playerStateChangeListener);
                         player.setPlaybackEventListener(playbackEventListener);
-                        player.cueVideo(source);
+
+                        if (!wasRestored) { // TODO what does this mean?
+                            player.cueVideo(source);
+                        }
                         trailerLoaded = true;
                         showMessage("init YouTube player success!");
                     }
@@ -163,33 +184,38 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
     }
 
     public void onPlayTrailer(View view) {
-        if (!trailerLoaded) {
-            showMessage("trailer not loaded. trying now...");
-            loadTrailer();
-        } else {
-            showMessage("already loaded, playing!");
-            playTrailer();
+        // check if video data has been fetched
+        if (videos == null) {
+            showMessage("PLAY: no video data, fetching now, try again later");
+            fetchVideoData();
+        }
+        else if (videos.isEmpty()) {
+            // there are no videos
+            showMessage("PLAY: no trailer :(");
+        }
+        else {
+            // check if the youtube player is ready and loaded
+            if (!trailerLoaded) {
+                showMessage("PLAY: no trailer, fetching now");
+                loadTrailer(); // auto play from onLoaded method below
+            }
+            else {
+                showMessage("PLAY: hooray!");
+                playTrailer();
+            }
         }
     }
 
-    public void playTrailer() {
-//        ytTrailer.setVisibility(View.VISIBLE);
-//        player.setFullscreen(true);
-        player.play();
-    }
-
-    void showMessage(String message) {
+    private void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onFullscreen(boolean b) {
-        showMessage("on full screen " + b);
-//        player.setFullscreen(false);
+    public void playTrailer() {
+        ytTrailer.setVisibility(View.VISIBLE);
+        player.play();
     }
 
     private final class MyPlaybackEventListener implements YouTubePlayer.PlaybackEventListener {
-
         @Override
         public void onPlaying() {
             // Called when playback starts, either due to user action or call to play().
@@ -211,7 +237,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
         @Override
         public void onBuffering(boolean b) {
             // Called when buffering starts or ends.
-            showMessage("buffering start/end");
+//            showMessage("buffering start/end");
         }
 
         @Override
@@ -234,6 +260,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
             // Called when a video is done loading.
             // Playback methods such as play(), pause() or seekToMillis(int) may be called after this callback.
             showMessage("loaded!");
+            // calling player.play from here causes video to enter full screen mode by default.
 //            playTrailer();
         }
 
@@ -251,13 +278,28 @@ public class MovieDetailActivity extends YouTubeBaseActivity implements YouTubeP
         public void onVideoEnded() {
             // Called when the video reaches its end.
             showMessage("video ended!");
-//            ytTrailer.setVisibility(View.GONE);
+            ytTrailer.setVisibility(View.GONE);
+            // TODO: restore non full screen mode
+            // restore original orientation
         }
 
         @Override
         public void onError(YouTubePlayer.ErrorReason errorReason) {
             // Called when an error occurs.
             showMessage("error! " + errorReason);
+        }
+    }
+
+    private final class MyFullScreenListener implements YouTubePlayer.OnFullscreenListener {
+        @Override
+        public void onFullscreen(boolean b) {
+            if (!b) {
+                showMessage("LEAVE full screen");
+                player.pause();
+            }
+            else {
+                showMessage("ENTER full screen");
+            }
         }
     }
 }

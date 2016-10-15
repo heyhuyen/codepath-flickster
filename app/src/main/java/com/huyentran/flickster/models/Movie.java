@@ -29,15 +29,15 @@ public class Movie implements Serializable {
         POPULAR, REGULAR
     }
 
-    long id;
-    String originalTitle;
-    String overview;
-    String posterPath;
-    String backdropPath;
-    String releaseDate;
-    long rating;
-    long popularity;
-    Type type;
+    private long id;
+    private String originalTitle;
+    private String overview;
+    private String posterPath;
+    private String backdropPath;
+    private String releaseDate;
+    private long rating;
+    private long popularity;
+    private Type type;
 
     public Movie(JSONObject jsonObject) throws JSONException {
         this.id = jsonObject.getLong(ID_KEY);
@@ -64,7 +64,7 @@ public class Movie implements Serializable {
         return results;
     }
 
-    public static Type typeFromRating(long rating) {
+    private Type typeFromRating(long rating) {
         if (rating > POPULAR_MIN_RATING) {
             return Type.POPULAR;
         }
