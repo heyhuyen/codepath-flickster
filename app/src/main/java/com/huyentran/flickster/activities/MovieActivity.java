@@ -2,7 +2,6 @@ package com.huyentran.flickster.activities;
 
 import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.huyentran.flickster.R;
 import com.huyentran.flickster.adapters.MovieArrayAdapter;
 import com.huyentran.flickster.models.Movie;
@@ -25,20 +25,18 @@ import java.util.HashSet;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.huyentran.flickster.utils.Constants.NOW_PLAYING_URL;
 import static com.huyentran.flickster.utils.Constants.RESULTS_KEY;
 import static com.huyentran.flickster.utils.Constants.TOTAL_PAGES_KEY;
 
 /**
  * The main app activity for movies browsing.
  */
-public class MovieActivity extends AppCompatActivity
+public class MovieActivity extends YouTubeBaseActivity
         implements MovieArrayAdapter.DataLoaderInterface {
-
-    private static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?page=%d&api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
     private static final int PAGE_ONE = 1;
 
     ListView lvMovies;
-
     ArrayList<Movie> movies;
     MovieArrayAdapter movieAdapter;
 
