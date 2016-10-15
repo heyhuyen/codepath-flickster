@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,9 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
+import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+import static com.google.android.youtube.player.YouTubePlayer.FULLSCREEN_FLAG_CONTROL_SYSTEM_UI;
 import static com.huyentran.flickster.utils.Constants.BACKDROP_WIDTH;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_MARGIN;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_RADIUS;
@@ -44,6 +48,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     ArrayList<Video> videos;
 
     YouTubePlayerView ytTrailer;
+    ScrollView scrollView;
     ImageView ivBackdrop;
     ImageView ivPoster;
     TextView tvTitle;
@@ -54,7 +59,8 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     TextView tvRuntime;
 
     YouTubePlayer player;
-    boolean trailerLoaded;
+    private boolean videoDataFetched;
+    private boolean trailerLoaded;
     private MyPlayerStateChangeListener playerStateChangeListener;
     private MyPlaybackEventListener playbackEventListener;
     private MyFullScreenListener fullScreenListener;
@@ -65,6 +71,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         setContentView(R.layout.activity_movie_detail);
         findViews();
         movie = (Movie) getIntent().getSerializableExtra("movie");
+        videoDataFetched = false;
         trailerLoaded = false;
 
         // populate view data
@@ -82,11 +89,12 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         // fetch videos
         client = new AsyncHttpClient();
         setupYoutubeListeners();
-        fetchVideoData(); // TODO: add video data to Movie model
+        fetchVideoData();
     }
 
     private void findViews() {
         ytTrailer = (YouTubePlayerView) findViewById(R.id.ytTrailer);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
         ivBackdrop = (ImageView) findViewById(R.id.ivBackdrop);
         ivPoster = (ImageView) findViewById(R.id.ivPoster);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
@@ -95,6 +103,10 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         tvOverview = (TextView) findViewById(R.id.tvOverview);
         tvReleaseDate = (TextView) findViewById(R.id.tvReleaseDate);
         tvRuntime = (TextView) findViewById(R.id.tvRuntime);
+    }
+
+    private void setOtherViewsVisibility(int visibility) {
+        scrollView.setVisibility(visibility);
     }
 
     private void loadImages() {
@@ -130,6 +142,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
                 try {
                     youtubeResults = response.getJSONArray("youtube");
                     videos = Video.fromJSONArray(youtubeResults);
+                    videoDataFetched = true;
                 } catch (JSONException e) {
                     Log.d("DEBUG", "Parse video data error: " + e.toString());
                     e.printStackTrace();
@@ -164,11 +177,10 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
                                                         boolean wasRestored) {
 
                         player = youTubePlayer;
-//                        player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+                        player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
                         player.setOnFullscreenListener(fullScreenListener);
                         player.setPlayerStateChangeListener(playerStateChangeListener);
                         player.setPlaybackEventListener(playbackEventListener);
-
                         if (!wasRestored) { // TODO what does this mean?
                             player.cueVideo(source);
                         }
@@ -184,25 +196,31 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     }
 
     public void onPlayTrailer(View view) {
-        // check if video data has been fetched
-        if (videos == null) {
-            showMessage("PLAY: no video data, fetching now, try again later");
-            fetchVideoData();
-        }
-        else if (videos.isEmpty()) {
-            // there are no videos
-            showMessage("PLAY: no trailer :(");
-        }
-        else {
-            // check if the youtube player is ready and loaded
-            if (!trailerLoaded) {
-                showMessage("PLAY: no trailer, fetching now");
-                loadTrailer(); // auto play from onLoaded method below
+        if (videoDataFetched) {
+            // check if video data has been fetched
+            if (videos == null) {
+                showMessage("PLAY: no video data, fetching now, try again later");
+                fetchVideoData();
+            }
+            else if (videos.isEmpty()) {
+                // there are no videos
+                showMessage("PLAY: no trailer :(");
             }
             else {
-                showMessage("PLAY: hooray!");
-                playTrailer();
+                // check if the youtube player is ready and loaded
+                if (!trailerLoaded) {
+                    showMessage("PLAY: no trailer, fetching now");
+                    loadTrailer(); // auto play from onLoaded method below
+                }
+                else {
+                    showMessage("PLAY: hooray!");
+                    playTrailer();
+                }
             }
+        }
+        else {
+            showMessage("PLAY: disabled");
+            fetchVideoData();
         }
     }
 
@@ -210,8 +228,8 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void playTrailer() {
-        ytTrailer.setVisibility(View.VISIBLE);
+    private void playTrailer() {
+        showFullscreenTrailer(true);
         player.play();
     }
 
@@ -260,7 +278,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
             // Called when a video is done loading.
             // Playback methods such as play(), pause() or seekToMillis(int) may be called after this callback.
             showMessage("loaded!");
-            // calling player.play from here causes video to enter full screen mode by default.
+            // calling player.play from here causes video to enter landscape  mode.
 //            playTrailer();
         }
 
@@ -278,15 +296,18 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         public void onVideoEnded() {
             // Called when the video reaches its end.
             showMessage("video ended!");
+            player.setFullscreen(false);
             ytTrailer.setVisibility(View.GONE);
-            // TODO: restore non full screen mode
-            // restore original orientation
+            setOtherViewsVisibility(View.VISIBLE);
         }
 
         @Override
         public void onError(YouTubePlayer.ErrorReason errorReason) {
-            // Called when an error occurs.
             showMessage("error! " + errorReason);
+            if (errorReason == YouTubePlayer.ErrorReason.UNAUTHORIZED_OVERLAY) {
+                hideStatusAndNavBars();
+                player.play();
+            }
         }
     }
 
@@ -295,11 +316,33 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         public void onFullscreen(boolean b) {
             if (!b) {
                 showMessage("LEAVE full screen");
-                player.pause();
+                showFullscreenTrailer(false);
             }
             else {
                 showMessage("ENTER full screen");
             }
+//            fullscreen = b;
         }
+    }
+
+    private void showFullscreenTrailer(boolean fullscreen) {
+        if (fullscreen) {
+            player.setFullscreen(true);
+            setOtherViewsVisibility(View.GONE);
+            ytTrailer.setVisibility(View.VISIBLE);
+            hideStatusAndNavBars();
+        }
+        else {
+            player.setFullscreen(false);
+            ytTrailer.setVisibility(View.GONE);
+            setOtherViewsVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideStatusAndNavBars() {
+        // hide status + nav bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = SYSTEM_UI_FLAG_FULLSCREEN | SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 }
