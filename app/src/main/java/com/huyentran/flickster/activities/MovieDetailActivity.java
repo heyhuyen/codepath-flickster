@@ -12,7 +12,6 @@ import com.squareup.picasso.Picasso;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-import static com.huyentran.flickster.utils.Constants.POSTER_WIDTH;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_MARGIN;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_RADIUS;
 
@@ -46,7 +45,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         Picasso.with(this).load(movie.getPosterPath())
                 .placeholder(R.drawable.poster_placeholder)
                 .error(R.drawable.error)
-                .resize(POSTER_WIDTH, 0)
+                .fit()
+                .centerInside()
                 .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
                         ROUNDED_CORNER_MARGIN))
                 .into(ivPoster);

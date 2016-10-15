@@ -15,8 +15,9 @@ public class Movie implements Serializable {
     private static final String POSTER_PATH_FORMAT = "https://image.tmdb.org/t/p/w342/%s";
     private static final String BACKDROP_PATH_FORMAT = "https://image.tmdb.org/t/p/w780/%s";
     private static final long POPULAR_MIN_RATING = 5L;
+
     public enum Type {
-        POPULAR, AVERAGE
+        POPULAR, REGULAR
     }
 
     long id;
@@ -58,7 +59,7 @@ public class Movie implements Serializable {
         if (rating > POPULAR_MIN_RATING) {
             return Type.POPULAR;
         }
-        return Type.AVERAGE;
+        return Type.REGULAR;
     }
 
     public long getId() {

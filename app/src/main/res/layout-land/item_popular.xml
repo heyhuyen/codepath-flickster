@@ -3,11 +3,11 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="@dimen/lv_row_height">
+              android:layout_height="@dimen/popular_height">
 
     <ImageView
         android:id="@+id/ivPopular"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/popular_width"
         android:layout_height="match_parent"
         tools:src="@mipmap/ic_launcher"/>
 </LinearLayout>

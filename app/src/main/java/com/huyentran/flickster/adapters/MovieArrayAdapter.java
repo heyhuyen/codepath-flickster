@@ -1,6 +1,7 @@
 package com.huyentran.flickster.adapters;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +28,14 @@ import static com.huyentran.flickster.R.id.tvTitle;
  */
 public class MovieArrayAdapter extends ArrayAdapter<Movie> {
 
-    // View lookup cache
     private static class ViewHolder {
         ImageView poster;
         TextView title;
         TextView overview;
-        ImageView backdrop;
+    }
+
+    private static class PopularViewHolder {
+        ImageView popular;
     }
 
     public MovieArrayAdapter(Context context, List<Movie> movies) {
@@ -59,68 +62,78 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         // get the data item for position
         Movie movie = getItem(position);
 
-        // check if the existing view is being reused; otherwise inflate the view
-        ViewHolder viewHolder; // view lookup cache stored in tag
-        if (convertView == null) {
-            // Get the data item type for this position
-            int type = getItemViewType(position);
+        // get data item type for this position
+        int viewType = this.getItemViewType(position);
 
-            // If there's no view to re-use, inflate a brand new view for row
-            viewHolder = new ViewHolder();
+        if (viewType == Movie.Type.REGULAR.ordinal()) {
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                // If there's no view to re-use, inflate a brand new view for row
+                viewHolder = new ViewHolder();
 
-            // Inflate XML layout based on the type
-            convertView = getInflatedLayoutForType(type, parent);
-            viewHolder.poster = (ImageView) convertView.findViewById(ivPoster);
-            viewHolder.title = (TextView) convertView.findViewById(tvTitle);
-            viewHolder.overview = (TextView) convertView.findViewById(tvOverview);
-            viewHolder.backdrop = (ImageView) convertView.findViewById(R.id.ivBackdrop);
-            // Cache the viewHolder object inside the fresh view
-            convertView.setTag(viewHolder);
-        } else {
-            // View is being recycled, retrieve the viewHolder object from tag
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+                // Inflate XML layout based on the type
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_movie,
+                        parent, false);
+                viewHolder.poster = (ImageView) convertView.findViewById(ivPoster);
+                viewHolder.title = (TextView) convertView.findViewById(tvTitle);
+                viewHolder.overview = (TextView) convertView.findViewById(tvOverview);
+                // Cache the viewHolder object inside the fresh view
+                convertView.setTag(viewHolder);
+            } else {
+                // View is being recycled, retrieve the viewHolder object from tag
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
 
-        // populate data
-        if (viewHolder.title != null) {
+            // populate data
             viewHolder.title.setText(movie.getOriginalTitle());
-        }
-        if (viewHolder.overview != null) {
             viewHolder.overview.setText(movie.getOverview());
-        }
-        String imagePath = movie.getPosterPath();
-        ImageView imageView = viewHolder.poster;
-        int targetWidth = Constants.POSTER_WIDTH;
-        int placeholder = R.drawable.poster_placeholder;
-        if (viewHolder.poster != null) {
             viewHolder.poster.setImageResource(0);
-        } else {
-            viewHolder.backdrop.setImageResource(0);
-            imagePath = movie.getBackdropPath();
-            imageView = viewHolder.backdrop;
-            targetWidth = Constants.BACKDROP_WIDTH;
-            placeholder = R.drawable.backdrop_placeholder;
+            // check portrait or landscape
+            if (getContext().getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_LANDSCAPE) {
+                loadImage(movie.getBackdropPath(), R.drawable.backdrop_placeholder,
+                        viewHolder.poster);
+            }
+            else {
+                loadImage(movie.getPosterPath(), R.drawable.poster_placeholder,
+                        viewHolder.poster);
+            }
+
+            return convertView;
         }
+        else if (viewType == Movie.Type.POPULAR.ordinal()) {
+            PopularViewHolder popularViewHolder;
+            if (convertView == null) {
+                popularViewHolder = new PopularViewHolder();
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_popular,
+                        parent, false);
+                popularViewHolder.popular =
+                        (ImageView) convertView.findViewById(R.id.ivPopular);
+                convertView.setTag(popularViewHolder);
+            } else {
+                popularViewHolder = (PopularViewHolder) convertView.getTag();
+            }
+
+            // populate data
+            popularViewHolder.popular.setImageResource(0);
+            loadImage(movie.getBackdropPath(), R.drawable.backdrop_placeholder,
+                    popularViewHolder.popular);
+
+            return convertView;
+        }
+        else {
+            throw new RuntimeException("Unknown row item type");
+        }
+    }
+
+    private void loadImage(String imagePath, int placeholder, ImageView imageView) {
         Picasso.with(getContext()).load(imagePath)
+                .fit()
+                .centerInside()
                 .placeholder(placeholder)
                 .error(R.drawable.error)
-                .resize(targetWidth, 0)
                 .transform(new RoundedCornersTransformation(Constants.ROUNDED_CORNER_RADIUS,
                         Constants.ROUNDED_CORNER_MARGIN))
                 .into(imageView);
-
-        // return the view
-        return convertView;
-    }
-
-    // Given the item type, responsible for returning the correct inflated XML layout file
-    private View getInflatedLayoutForType(int type, ViewGroup parent) {
-        if (type == Movie.Type.POPULAR.ordinal()) {
-            return LayoutInflater.from(getContext()).inflate(R.layout.item_popular, parent, false);
-        } else if (type == Movie.Type.AVERAGE.ordinal()) {
-            return LayoutInflater.from(getContext()).inflate(R.layout.item_movie, parent, false);
-        } else {
-            return null;
-        }
     }
 }
