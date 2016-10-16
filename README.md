@@ -46,7 +46,7 @@ fetched when row view for last item is created)
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://imgur.com/Q5gPAl8.gif' title='Video Walkthrough' width='400px' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -72,6 +72,7 @@ and centerInside would get bounded by the match_parent width (I think...)
 ## Artwork used
 * Film strip: http://cliparts.co/clipart/678562"
 * Sad drama mask: https://www.iconfinder.com/icons/174778/mask_tragedy_icon#size=512
+* Play trailer icon: http://iconmonstr.com/video-15/
 
 ## License
 
