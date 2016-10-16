@@ -1,122 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rlMovieDetail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-    <com.google.android.youtube.player.YouTubePlayerView
-        android:id="@+id/ytTrailer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        <ImageView
+            android:id="@+id/ivBackdrop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            tools:src="@mipmap/ic_launcher"
+            android:onClick="onPlayTrailer"
+            android:clickable="false" />
 
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/ivPoster"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/poster_height"
+            android:layout_below="@id/ivBackdrop"
+            tools:src="@mipmap/ic_launcher" />
 
-        <RelativeLayout
-            android:id="@+id/rlMovieDetail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/ivPoster"
+            android:layout_below="@id/ivBackdrop"
+            tools:text="The Magnificent Seven"
+            android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
-            <ImageView
-                android:id="@+id/ivBackdrop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                tools:src="@mipmap/ic_launcher"
-                android:onClick="onPlayTrailer"
-                android:clickable="false" />
+        <RatingBar
+            android:id="@+id/rbRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_toEndOf="@+id/ivPoster"
+            style="@android:style/Widget.Material.RatingBar.Small"
+            />
 
-            <ImageView
-                android:id="@+id/ivPoster"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/poster_height"
-                android:layout_below="@id/ivBackdrop"
-                tools:src="@mipmap/ic_launcher" />
+        <TextView
+            android:id="@+id/tvPopularity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rbRating"
+            android:layout_alignStart="@+id/rbRating"
+            tools:text="popularity"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"/>
 
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/ivPoster"
-                android:layout_below="@id/ivBackdrop"
-                tools:text="The Magnificent Seven"
-                android:textAppearance="@android:style/TextAppearance.Material.Large" />
+        <TextView
+            android:id="@+id/tvOverviewLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivPoster"
+            android:text="@string/movie_details_label"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"/>
 
-            <RatingBar
-                android:id="@+id/rbRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTitle"
-                android:layout_toEndOf="@+id/ivPoster"
-                style="@android:style/Widget.Material.RatingBar.Small"
-                />
+        <TextView
+            android:id="@+id/tvOverview"
+            tools:text="A big screen remake of John Sturges' classic western The Magnificent Seven, itself a remake of Akira Kurosawa's Seven Samurai. Seven gun men in the old west gradually come together to help a poor village against savage thieves."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvOverviewLabel" />
 
-            <TextView
-                android:id="@+id/tvPopularity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/rbRating"
-                android:layout_alignLeft="@+id/rbRating"
-                tools:text="popularity"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"/>
+        <TextView
+            android:id="@+id/tvReleaseDateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvOverview"
+            android:text="@string/release_date_label"
+            android:textStyle="normal|bold"/>
 
-            <TextView
-                android:id="@+id/tvOverviewLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/ivPoster"
-                android:text="@string/movie_details_label"
-                android:textAppearance="@android:style/TextAppearance.Material.Large"/>
+        <TextView
+            android:id="@+id/tvReleaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/tvReleaseDateLabel"
+            android:layout_alignTop="@id/tvReleaseDateLabel"
+            tools:text="2016-10-31"
+            android:layout_marginStart="10dp" />
 
-            <TextView
-                android:id="@+id/tvOverview"
-                tools:text="A big screen remake of John Sturges' classic western The Magnificent Seven, itself a remake of Akira Kurosawa's Seven Samurai. Seven gun men in the old west gradually come together to help a poor village against savage thieves."
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvOverviewLabel" />
+        <TextView
+            android:id="@+id/tvRuntimeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvReleaseDateLabel"
+            android:text="@string/running_time_label"
+            android:textStyle="normal|bold"/>
 
-            <TextView
-                android:id="@+id/tvReleaseDateLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvOverview"
-                android:text="@string/release_date_label"
-                android:textStyle="normal|bold"/>
-
-            <TextView
-                android:id="@+id/tvReleaseDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/tvReleaseDateLabel"
-                android:layout_alignTop="@id/tvReleaseDateLabel"
-                tools:text="2016-10-31"
-                android:layout_marginLeft="10dp" />
-
-            <TextView
-                android:id="@+id/tvRuntimeLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvReleaseDateLabel"
-                android:text="@string/running_time_label"
-                android:textStyle="normal|bold"/>
-
-            <TextView
-                android:id="@+id/tvRuntime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/tvRuntimeLabel"
-                android:layout_alignTop="@id/tvRuntimeLabel"
-                android:layout_marginLeft="10dp"
-                android:text="120 min" />
-        </RelativeLayout>
-    </ScrollView>
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvRuntime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/tvRuntimeLabel"
+            android:layout_alignTop="@id/tvRuntimeLabel"
+            android:layout_marginStart="10dp"
+            android:text="120 min" />
+    </RelativeLayout>
+</ScrollView>
