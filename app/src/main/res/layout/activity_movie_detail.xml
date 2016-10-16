@@ -32,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 tools:src="@mipmap/ic_launcher"
-                android:onClick="onPlayTrailer" />
+                android:onClick="onPlayTrailer"
+                android:clickable="false" />
 
             <ImageView
                 android:id="@+id/ivPoster"

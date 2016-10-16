@@ -15,6 +15,6 @@ public final class MovieDataUtils {
                 return video.getSource();
             }
         }
-        return null;
+        return "";
     }
 }
