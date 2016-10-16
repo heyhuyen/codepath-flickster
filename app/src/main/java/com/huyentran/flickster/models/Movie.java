@@ -7,6 +7,15 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import static com.huyentran.flickster.utils.Constants.BACKDROP_KEY;
+import static com.huyentran.flickster.utils.Constants.ID_KEY;
+import static com.huyentran.flickster.utils.Constants.OVERVIEW_KEY;
+import static com.huyentran.flickster.utils.Constants.POPULARITY_KEY;
+import static com.huyentran.flickster.utils.Constants.POSTER_KEY;
+import static com.huyentran.flickster.utils.Constants.RATING_KEY;
+import static com.huyentran.flickster.utils.Constants.RELEASE_DATE_KEY;
+import static com.huyentran.flickster.utils.Constants.TITLE_KEY;
+
 /**
  * Movie model.
  */
@@ -31,16 +40,16 @@ public class Movie implements Serializable {
     Type type;
 
     public Movie(JSONObject jsonObject) throws JSONException {
-        this.id = jsonObject.getLong("id");
-        this.posterPath = jsonObject.getString("poster_path");
-        this.originalTitle = jsonObject.getString("original_title");
-        this.overview = jsonObject.getString("overview");
-        this.backdropPath = jsonObject.getString("backdrop_path");
-        this.releaseDate = jsonObject.getString("release_date");
+        this.id = jsonObject.getLong(ID_KEY);
+        this.posterPath = jsonObject.getString(POSTER_KEY);
+        this.originalTitle = jsonObject.getString(TITLE_KEY);
+        this.overview = jsonObject.getString(OVERVIEW_KEY);
+        this.backdropPath = jsonObject.getString(BACKDROP_KEY);
+        this.releaseDate = jsonObject.getString(RELEASE_DATE_KEY);
 
-        this.rating = jsonObject.getLong("vote_average");
+        this.rating = jsonObject.getLong(RATING_KEY);
         this.type = typeFromRating(this.rating);
-        this.popularity = jsonObject.getLong("popularity");
+        this.popularity = jsonObject.getLong(POPULARITY_KEY);
     }
 
     public static ArrayList<Movie> fromJSONArray(JSONArray jsonArray) {

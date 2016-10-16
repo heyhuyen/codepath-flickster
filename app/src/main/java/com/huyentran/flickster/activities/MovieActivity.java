@@ -21,15 +21,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import cz.msebera.android.httpclient.Header;
+
+import static com.huyentran.flickster.utils.Constants.RESULTS_KEY;
+import static com.huyentran.flickster.utils.Constants.TOTAL_PAGES_KEY;
 
 /**
  * The main app activity for movies browsing.
  */
-public class MovieActivity extends AppCompatActivity {
+public class MovieActivity extends AppCompatActivity
+        implements MovieArrayAdapter.DataLoaderInterface {
 
-    private static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
+    private static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?page=%d&api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
+    private static final int PAGE_ONE = 1;
 
     ListView lvMovies;
 
@@ -37,8 +43,10 @@ public class MovieActivity extends AppCompatActivity {
     MovieArrayAdapter movieAdapter;
 
     private AsyncHttpClient client;
+    private int curPage;
+    private boolean loadedLastPage;
     private SwipeRefreshLayout swipeContainer;
-
+    private HashSet<Long> movieIdCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,24 +60,52 @@ public class MovieActivity extends AppCompatActivity {
         movieAdapter = new MovieArrayAdapter(this, movies);
         lvMovies.setAdapter(movieAdapter);
         client = new AsyncHttpClient();
-        fetchNowPlayingAsync();
+        curPage = PAGE_ONE;
+        movieIdCache = new HashSet<>();
+        loadedLastPage = false;
+        fetchNowPlayingAsync(true);
 
         setupSwipeContainer();
         setupListViewListeners();
     }
 
+    public void loadMoreData() {
+        fetchNowPlayingAsync(false);
+    }
+
     /**
      * Asynchronous HTTP request to Movie DB API to fetch now playing movies.
      */
-    public void fetchNowPlayingAsync() {
-        client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
+    public void fetchNowPlayingAsync(final boolean refresh) {
+        if (loadedLastPage) {
+            return;
+        }
+        client.get(String.format(NOW_PLAYING_URL, curPage), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray movieJsonResults = null;
+                JSONArray movieJsonResults;
                 try {
-                    movieAdapter.clear();
-                    movieJsonResults = response.getJSONArray("results");
-                    movieAdapter.addAll(Movie.fromJSONArray(movieJsonResults));
+                    movieJsonResults = response.getJSONArray(RESULTS_KEY);
+                    if (refresh) {
+                        // wipe data
+                        movieIdCache.clear();
+                        movieAdapter.clear();
+                        curPage = PAGE_ONE;
+                        loadedLastPage = false;
+                    }
+                    // avoid displaying duplicate movies
+                    for (Movie movie : Movie.fromJSONArray(movieJsonResults)) {
+                        if (!movieIdCache.contains(movie.getId())) {
+                            movieAdapter.add(movie);
+                            movieIdCache.add(movie.getId());
+                        }
+                    }
+                    // check if this is the last page of results
+                    int numPages = response.getInt(TOTAL_PAGES_KEY);
+                    if (curPage >= numPages) {
+                        loadedLastPage = true;
+                    }
+                    curPage++;
                 } catch (JSONException e) {
                     Log.d("DEBUG", "Fetch now playing error: " + e.toString());
                     e.printStackTrace();
@@ -104,7 +140,7 @@ public class MovieActivity extends AppCompatActivity {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchNowPlayingAsync();
+                fetchNowPlayingAsync(true);
                 // Now we call setRefreshing(false) to signal refresh has finished
                 swipeContainer.setRefreshing(false);
             }

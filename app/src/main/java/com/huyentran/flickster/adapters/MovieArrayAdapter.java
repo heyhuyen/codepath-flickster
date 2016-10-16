@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.huyentran.flickster.R;
+import com.huyentran.flickster.activities.MovieActivity;
 import com.huyentran.flickster.models.Movie;
 import com.huyentran.flickster.utils.Constants;
 import com.squareup.picasso.Picasso;
@@ -28,6 +29,10 @@ import static com.huyentran.flickster.R.id.tvTitle;
  */
 public class MovieArrayAdapter extends ArrayAdapter<Movie> {
 
+    public interface DataLoaderInterface {
+        void loadMoreData();
+    }
+
     private static class ViewHolder {
         ImageView poster;
         TextView title;
@@ -38,8 +43,11 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         ImageView popular;
     }
 
+    private DataLoaderInterface dataLoader;
+
     public MovieArrayAdapter(Context context, List<Movie> movies) {
         super(context, android.R.layout.simple_list_item_1, movies);
+        this.dataLoader = (MovieActivity) context;
     }
 
     // Returns the number of types of Views that will be created by getView(int, View, ViewGroup)
@@ -59,6 +67,11 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // check if position is last item
+        if (position == getCount() - 1) {
+            dataLoader.loadMoreData();
+        }
+
         // get the data item for position
         Movie movie = getItem(position);
 
