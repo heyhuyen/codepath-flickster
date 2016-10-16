@@ -10,9 +10,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.huyentran.flickster.R;
 import com.huyentran.flickster.adapters.MovieArrayAdapter;
 import com.huyentran.flickster.models.Movie;
+import com.huyentran.flickster.models.Video;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -28,6 +30,9 @@ import cz.msebera.android.httpclient.Header;
 import static com.huyentran.flickster.utils.Constants.NOW_PLAYING_URL;
 import static com.huyentran.flickster.utils.Constants.RESULTS_KEY;
 import static com.huyentran.flickster.utils.Constants.TOTAL_PAGES_KEY;
+import static com.huyentran.flickster.utils.Constants.VIDEOS_TRAILER_URL;
+import static com.huyentran.flickster.utils.Constants.YOUTUBE_API_KEY;
+import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceFromResults;
 
 /**
  * The main app activity for movies browsing.
@@ -124,10 +129,41 @@ public class MovieActivity extends YouTubeBaseActivity
     /**
      * Launches the {@link MovieDetailActivity} for the given movie.
      */
-    public void launchMovieDetailView(Movie movie) {
+    private void launchMovieDetailView(Movie movie) {
         Intent i = new Intent(this, MovieDetailActivity.class);
         i.putExtra("movie", movie);
         startActivity(i);
+    }
+
+    private void onPlayTrailer(long movieId) {
+        // TODO: save
+        client.get(String.format(VIDEOS_TRAILER_URL, movieId), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray youtubeResults;
+                try {
+                    youtubeResults = response.getJSONArray("youtube");
+                    String trailerSource =
+                            youtubeTrailerSourceFromResults(Video.fromJSONArray(youtubeResults));
+                    if (!trailerSource.isEmpty()) {
+                        Intent intent =
+                                YouTubeStandalonePlayer.createVideoIntent(MovieActivity.this,
+                                        YOUTUBE_API_KEY, trailerSource, 0, true, false);
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    Log.d("DEBUG", "Parse video data error: " + e.toString());
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString,
+                                  Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.d("DEBUG", "Fetch trailer error");
+            }
+        });
     }
 
     /**
@@ -151,15 +187,17 @@ public class MovieActivity extends YouTubeBaseActivity
                 android.R.color.holo_red_light);
     }
 
-    /**
-     * Adds listeners to the list view: item click and long item clicks for editing and removing.
-     */
     private void setupListViewListeners() {
         lvMovies.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
-                        launchMovieDetailView(movies.get(pos));
+                        Movie movie = movies.get(pos);
+                        if (movie.getType() == Movie.Type.POPULAR) {
+                            onPlayTrailer(movie.getId());
+                        } else {
+                            launchMovieDetailView(movies.get(pos));
+                        }
                     }
                 }
         );

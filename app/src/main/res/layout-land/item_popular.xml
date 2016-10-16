@@ -9,5 +9,5 @@
         android:id="@+id/ivPopular"
         android:layout_width="@dimen/popular_width"
         android:layout_height="match_parent"
-        tools:src="@mipmap/ic_launcher"/>
+        tools:src="@mipmap/ic_launcher" />
 </LinearLayout>
