@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
+import static com.huyentran.flickster.R.id.ivPlayIcon;
+import static com.huyentran.flickster.R.id.ytTrailer;
 import static com.huyentran.flickster.utils.Constants.BACKDROP_WIDTH;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_MARGIN;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_RADIUS;
@@ -44,9 +47,9 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     Movie movie;
     AsyncHttpClient client;
 
-    YouTubePlayerView ytTrailer;
     ScrollView scrollView;
     ImageView ivBackdrop;
+    ImageView ivPlayIcon;
     ImageView ivPoster;
     TextView tvTitle;
     RatingBar rbRating;
@@ -83,9 +86,9 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     }
 
     private void findViews() {
-        ytTrailer = (YouTubePlayerView) findViewById(R.id.ytTrailer);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         ivBackdrop = (ImageView) findViewById(R.id.ivBackdrop);
+        ivPlayIcon = (ImageView) findViewById(R.id.ivPlayIcon);
         ivPoster = (ImageView) findViewById(R.id.ivPoster);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         rbRating = (RatingBar) findViewById(R.id.rbRating);
@@ -124,13 +127,13 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
                     videos = Video.fromJSONArray(youtubeResults);
                     trailerSource = youtubeTrailerSourceFromResults(videos);
                     if (trailerSource.isEmpty()) {
-                        showMessage("movie has no trailer");
                         // disable trailer click
                         ivBackdrop.setEnabled(false);
+                        ivPlayIcon.setVisibility(View.GONE);
                     } else {
-                        showMessage("movie trailer found");
                         // enable trailer click
                         ivBackdrop.setEnabled(true);
+                        ivPlayIcon.setVisibility(View.VISIBLE);
                     }
                 } catch (JSONException e) {
                     Log.d("DEBUG", "Parse video data error: " + e.toString());

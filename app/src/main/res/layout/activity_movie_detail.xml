@@ -15,20 +15,34 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
-        <ImageView
-            android:id="@+id/ivBackdrop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            tools:src="@mipmap/ic_launcher"
-            android:onClick="onPlayTrailer"
-            android:clickable="false" />
+        <RelativeLayout
+            android:id="@+id/rlTrailerPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivBackdrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                tools:src="@mipmap/ic_launcher"
+                android:onClick="onPlayTrailer"
+                android:clickable="false" />
+
+            <ImageView
+                android:id="@+id/ivPlayIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/play_icon"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/ivPoster"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/poster_height"
-            android:layout_below="@id/ivBackdrop"
+            android:layout_below="@id/rlTrailerPlayer"
             tools:src="@mipmap/ic_launcher" />
 
         <TextView
@@ -36,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/ivPoster"
-            android:layout_below="@id/ivBackdrop"
+            android:layout_below="@id/rlTrailerPlayer"
             tools:text="The Magnificent Seven"
             android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
