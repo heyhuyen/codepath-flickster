@@ -32,6 +32,7 @@ import static com.huyentran.flickster.utils.Constants.RESULTS_KEY;
 import static com.huyentran.flickster.utils.Constants.TOTAL_PAGES_KEY;
 import static com.huyentran.flickster.utils.Constants.VIDEOS_TRAILER_URL;
 import static com.huyentran.flickster.utils.Constants.YOUTUBE_API_KEY;
+import static com.huyentran.flickster.utils.Constants.YOUTUBE_VIDEOS_KEY;
 import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceFromResults;
 
 /**
@@ -135,14 +136,18 @@ public class MovieActivity extends YouTubeBaseActivity
         startActivity(i);
     }
 
+    /**
+     * Launches {@link YouTubeStandalonePlayer} to play movie trailer in full screen mode.
+     * @param movieId
+     */
     private void onPlayTrailer(long movieId) {
-        // TODO: save
+        // TODO: save/cache last played movie trailer in case same trailer is played
         client.get(String.format(VIDEOS_TRAILER_URL, movieId), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray youtubeResults;
                 try {
-                    youtubeResults = response.getJSONArray("youtube");
+                    youtubeResults = response.getJSONArray(YOUTUBE_VIDEOS_KEY);
                     String trailerSource =
                             youtubeTrailerSourceFromResults(Video.fromJSONArray(youtubeResults));
                     if (!trailerSource.isEmpty()) {

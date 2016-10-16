@@ -34,6 +34,7 @@ import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_MARGIN;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_RADIUS;
 import static com.huyentran.flickster.utils.Constants.VIDEOS_TRAILER_URL;
 import static com.huyentran.flickster.utils.Constants.YOUTUBE_API_KEY;
+import static com.huyentran.flickster.utils.Constants.YOUTUBE_VIDEOS_KEY;
 import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceFromResults;
 
 /**
@@ -119,7 +120,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray youtubeResults;
                 try {
-                    youtubeResults = response.getJSONArray("youtube");
+                    youtubeResults = response.getJSONArray(YOUTUBE_VIDEOS_KEY);
                     videos = Video.fromJSONArray(youtubeResults);
                     trailerSource = youtubeTrailerSourceFromResults(videos);
                     if (trailerSource.isEmpty()) {

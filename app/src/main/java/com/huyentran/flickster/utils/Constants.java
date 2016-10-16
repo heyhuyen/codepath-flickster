@@ -25,4 +25,5 @@ public class Constants {
     public static final String VIDEOS_TRAILER_URL = "https://api.themoviedb.org/3/movie/%s/trailers?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
 
     public static final String YOUTUBE_API_KEY = "AIzaSyCmAXBg9S3EJjEZPfXZ57mJYNxJw8fDX2E";
+    public static final String YOUTUBE_VIDEOS_KEY = "youtube";
 }
