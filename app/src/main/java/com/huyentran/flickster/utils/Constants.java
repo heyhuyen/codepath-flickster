@@ -16,7 +16,6 @@ public class Constants {
     public static final String RATING_KEY = "vote_average";
     public static final String POPULARITY_KEY = "popularity";
 
-    public static final int BACKDROP_WIDTH = 600;
     public static final int ROUNDED_CORNER_RADIUS = 10;
     public static final int ROUNDED_CORNER_MARGIN = 10;
 

@@ -4,17 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/popular_height">
 
-    <ImageView
-        android:id="@+id/ivPopular"
-        android:layout_width="@dimen/popular_width"
-        android:layout_height="match_parent"
-        tools:src="@mipmap/ic_launcher" />
+    <RelativeLayout
+        android:id="@+id/rlPopularBox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/ivPopular"
+            android:layout_width="@dimen/popular_width"
+            android:layout_height="match_parent"
+            tools:src="@mipmap/ic_launcher" />
 
-    <ImageView
-        android:id="@+id/ivPlayIcon"
+        <ImageView
+            android:id="@+id/ivPlayIcon"
+            android:layout_width="@dimen/play_icon_size"
+            android:layout_height="@dimen/play_icon_size"
+            android:layout_centerInParent="true"
+            android:src="@drawable/play_icon" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:src="@drawable/play_icon" />
+        android:layout_toRightOf="@+id/rlPopularBox"
+        android:layout_alignParentEnd="true"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        tools:text="The Magnificent Seven" />
 
+    <TextView
+        android:id="@+id/tvOverview"
+        android:layout_below="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/rlPopularBox"
+        android:layout_alignBottom="@+id/rlPopularBox"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+        android:ellipsize="end"
+        android:maxLines="7"
+        tools:text="A big screen remake of John Sturges' classic western The Magnificent Seven, itself a remake of Akira Kurosawa's Seven Samurai. Seven gun men in the old west gradually come together to help a poor village against savage thieves." />
 </RelativeLayout>

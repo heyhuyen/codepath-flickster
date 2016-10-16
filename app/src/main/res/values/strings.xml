@@ -2,5 +2,6 @@
     <string name="app_name">Flickster</string>
     <string name="running_time_label">Running Time</string>
     <string name="release_date_label">Release Date</string>
-    <string name="movie_details_label">Movie Info</string>
+    <string name="overview_label">Synopsis</string>
+    <string name="popularity_label">Popularity</string>
 </resources>

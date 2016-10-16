@@ -3,6 +3,7 @@
     <dimen name="lv_row_height">150dp</dimen>
     <dimen name="poster_height">150dp</dimen>
     <dimen name="poster_width">84dp</dimen>
-    <dimen name="popular_height">169dp</dimen>
+    layout_height="@dimen/popular_height"
     <dimen name="popular_width">300dp</dimen>
+    <dimen name="large_poster_height">300dp</dimen>
 </resources>

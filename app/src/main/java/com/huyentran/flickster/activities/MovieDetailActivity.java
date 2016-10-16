@@ -2,17 +2,14 @@ package com.huyentran.flickster.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.youtube.player.YouTubeBaseActivity;
-import com.google.android.youtube.player.YouTubePlayerView;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.huyentran.flickster.R;
 import com.huyentran.flickster.models.Movie;
@@ -30,9 +27,6 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-import static com.huyentran.flickster.R.id.ivPlayIcon;
-import static com.huyentran.flickster.R.id.ytTrailer;
-import static com.huyentran.flickster.utils.Constants.BACKDROP_WIDTH;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_MARGIN;
 import static com.huyentran.flickster.utils.Constants.ROUNDED_CORNER_RADIUS;
 import static com.huyentran.flickster.utils.Constants.VIDEOS_TRAILER_URL;
@@ -43,7 +37,7 @@ import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceF
 /**
  * An activity for viewing a single movie in more detail.
  */
-public class MovieDetailActivity extends YouTubeBaseActivity {
+public class MovieDetailActivity extends AppCompatActivity {
     Movie movie;
     AsyncHttpClient client;
 
@@ -56,7 +50,6 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
     TextView tvPopularity;
     TextView tvOverview;
     TextView tvReleaseDate;
-    TextView tvRuntime;
 
     ArrayList<Video> videos;
     private String trailerSource;
@@ -75,10 +68,7 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         tvOverview.setText(movie.getOverview());
         tvReleaseDate.setText(movie.getReleaseDate());
         rbRating.setRating(movie.getRating());
-        // tvRuntime
-        // genres?
-        // production companies?
-        // similar movies?
+        // TODO: more things!
 
         // fetch videos
         client = new AsyncHttpClient();
@@ -95,14 +85,14 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         tvPopularity = (TextView) findViewById(R.id.tvPopularity);
         tvOverview = (TextView) findViewById(R.id.tvOverview);
         tvReleaseDate = (TextView) findViewById(R.id.tvReleaseDate);
-        tvRuntime = (TextView) findViewById(R.id.tvRuntime);
     }
 
     private void loadImages() {
         Picasso.with(this).load(movie.getBackdropPath())
                 .placeholder(R.drawable.backdrop_placeholder)
                 .error(R.drawable.error)
-                .resize(BACKDROP_WIDTH, 0)
+                .fit()
+                .centerInside()
                 .transform(new RoundedCornersTransformation(ROUNDED_CORNER_RADIUS,
                         ROUNDED_CORNER_MARGIN))
                 .into(ivBackdrop);
@@ -154,9 +144,5 @@ public class MovieDetailActivity extends YouTubeBaseActivity {
         Intent intent = YouTubeStandalonePlayer.createVideoIntent(this, YOUTUBE_API_KEY,
                 trailerSource, 0, true, true);
         startActivity(intent);
-    }
-
-    private void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

@@ -2,7 +2,7 @@
 
 Flickster shows the latest movies currently playing in theaters. The app utilizes the Movie Database API to display images and basic information about these movies to the user.
 
-Time spent: 6 hours spent in total
+Time spent: 20 hours spent in total
 
 ## User Stories
 
@@ -27,9 +27,9 @@ The following **bonus** features are implemented:
 activity or dialog fragment.
 * [x] When viewing a popular movie (i.e. a movie voted for more than 5 stars) the video should
 show the full backdrop image as the layout.  Uses [Heterogenous ListViews](http://guides.codepath.com/android/Implementing-a-Heterogenous-ListView) or [Heterogenous RecyclerView](http://guides.codepath.com/android/Heterogenous-Layouts-inside-RecyclerView) to show different layouts.
-* [ ] Allow video trailers to be played in full-screen using the YouTubePlayerView.
-    * [ ] Overlay a play icon for videos that can be played.
-    * [ ] More popular movies should start a separate activity that plays the video immediately.
+* [x] Allow video trailers to be played in full-screen using the YouTubePlayerView.
+    * [x] Overlay a play icon for videos that can be played.
+    * [x] More popular movies should start a separate activity that plays the video immediately.
     * [ ] Less popular videos rely on the detail page should show ratings and a YouTube preview.
 * [ ] Apply the popular [Butterknife annotation library](http://guides.codepath.com/android/Reducing-View-Boilerplate-with-Butterknife) to reduce boilerplate code.
 * [x] Apply rounded corners for the poster or background images using [Picasso transformations]
@@ -38,7 +38,9 @@ show the full backdrop image as the layout.  Uses [Heterogenous ListViews](http:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] User can continuously scroll through all "Now Playing" movies (next page of API results
+fetched when row view for last item is created)
+* [x] Detail page plays YouTube trailer in an overlay
 
 ## Video Walkthrough
 
@@ -51,6 +53,16 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 Describe any challenges encountered while building the app.
+* YouTube: I went down a really dark path when implementing the YouTube feature. I didn't realize
+the standalone player existed for a long time (insert very sad face here). I had mistakenly thought
+that the detail view should also play the video in full screen and wasted a lot of time trying to
+manage custom fullscreen behavior which was really hard with the orientation switch that occurs from
+ portrait mode.
+* ImageView sizing: I had trouble getting the backdrop images to "match_parent" width-wise while
+maintaining the aspect ration of the image in a way that made sense to me. I probably need to spend
+more time understanding how Picasso and the layout values cooperate. What I ended up doing for
+the popular items in portrait mode was set the height to a large value so that the Picasso's fit
+and centerInside would get bounded by the match_parent width (I think...)
 
 ## Open-source libraries used
 

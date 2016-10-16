@@ -6,5 +6,9 @@
     <dimen name="lv_row_height">150dp</dimen>
     <dimen name="poster_height">150dp</dimen>
     <dimen name="poster_width">100dp</dimen>
+    <dimen name="popular_height">200dp</dimen>
     <dimen name="iv_error_size">24dp</dimen>
+    <dimen name="play_icon_size">50dp</dimen>
+    <dimen name="label_text_margin">10dp</dimen>
+    <dimen name="large_poster_height">500dp</dimen>
 </resources>

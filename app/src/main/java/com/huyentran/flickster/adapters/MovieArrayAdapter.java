@@ -20,6 +20,7 @@ import java.util.List;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
+import static android.R.transition.move;
 import static com.huyentran.flickster.R.id.ivPoster;
 import static com.huyentran.flickster.R.id.tvOverview;
 import static com.huyentran.flickster.R.id.tvTitle;
@@ -41,6 +42,8 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
 
     private static class PopularViewHolder {
         ImageView popular;
+        TextView title;
+        TextView overview;
     }
 
     private DataLoaderInterface dataLoader;
@@ -122,12 +125,18 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
                         parent, false);
                 popularViewHolder.popular =
                         (ImageView) convertView.findViewById(R.id.ivPopular);
+                popularViewHolder.title = (TextView) convertView.findViewById(tvTitle);
+                popularViewHolder.overview = (TextView) convertView.findViewById(tvOverview);
                 convertView.setTag(popularViewHolder);
             } else {
                 popularViewHolder = (PopularViewHolder) convertView.getTag();
             }
 
             // populate data
+            if (popularViewHolder.title != null) {
+                popularViewHolder.title.setText(movie.getOriginalTitle());
+                popularViewHolder.overview.setText(movie.getOverview());
+            }
             popularViewHolder.popular.setImageResource(0);
             loadImage(movie.getBackdropPath(), R.drawable.backdrop_placeholder,
                     popularViewHolder.popular);

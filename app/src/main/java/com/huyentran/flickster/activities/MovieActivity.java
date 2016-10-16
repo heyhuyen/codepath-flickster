@@ -3,13 +3,13 @@ package com.huyentran.flickster.activities;
 import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.huyentran.flickster.R;
 import com.huyentran.flickster.adapters.MovieArrayAdapter;
@@ -38,7 +38,7 @@ import static com.huyentran.flickster.utils.MovieDataUtils.youtubeTrailerSourceF
 /**
  * The main app activity for movies browsing.
  */
-public class MovieActivity extends YouTubeBaseActivity
+public class MovieActivity extends AppCompatActivity
         implements MovieArrayAdapter.DataLoaderInterface {
     private static final int PAGE_ONE = 1;
 
